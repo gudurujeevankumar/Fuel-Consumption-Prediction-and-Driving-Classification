@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: ecu-analytics
+    env: python
+    buildCommand: "pip install -r requirements.txt && python start.py" # start.py is run once here purely to seed database if needed and load ML models
+    startCommand: "gunicorn wsgi:app"
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: PYTHON_VERSION
+        value: 3.9.0

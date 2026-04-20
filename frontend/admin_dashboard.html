@@ -365,6 +365,24 @@
       height: 100%;
       border-radius: 3px
     }
+
+    .inline-spinner {
+      width: 30px; height: 30px;
+      border: 3px solid rgba(0, 210, 170, 0.2);
+      border-top-color: var(--teal);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 15px auto 10px auto;
+    }
+    .loading-row td {
+      text-align: center;
+      padding: 40px 0;
+      color: var(--muted);
+      font-family: 'Orbitron', monospace;
+      font-size: 12px;
+      letter-spacing: 2px;
+    }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
   </style>
 </head>
 
@@ -532,12 +550,18 @@
     }
 
     async function apiFetch(url) {
-      const res = await fetch(API + url, { credentials: 'include' });
-      if (res.status === 401 || res.status === 403) { location.href = 'admin_login.html'; return null; }
-      return res.json();
+      try {
+        const res = await fetch(API + url, { credentials: 'include' });
+        if (res.status === 401 || res.status === 403) { location.href = 'admin_login.html'; return null; }
+        return await res.json();
+      } catch (err) {
+        console.error("API error:", err);
+        return null;
+      }
     }
 
     async function loadOverview() {
+      document.getElementById('ov-recent').innerHTML = '<tr class="loading-row"><td colspan="6"><div class="inline-spinner"></div>LOADING DATA...</td></tr>';
       const data = await apiFetch('/admin/overview');
       if (!data) return;
       document.getElementById('ov-users').textContent = data.total_users;
@@ -556,6 +580,7 @@
     }
 
     async function loadUsers() {
+      document.getElementById('users-tbody').innerHTML = '<tr class="loading-row"><td colspan="7"><div class="inline-spinner"></div>LOADING DATA...</td></tr>';
       const data = await apiFetch('/admin/users');
       if (!data) return;
       document.getElementById('users-tbody').innerHTML = (data.users || []).map(u => `
@@ -581,6 +606,7 @@
     }
 
     async function loadAlerts() {
+      document.getElementById('alerts-tbody').innerHTML = '<tr class="loading-row"><td colspan="6"><div class="inline-spinner"></div>LOADING DATA...</td></tr>';
       const data = await apiFetch('/admin/alerts');
       if (!data) return;
       document.getElementById('alerts-tbody').innerHTML = (data.alerts || []).map(a => `
@@ -595,6 +621,8 @@
     }
 
     async function loadMetrics() {
+      document.getElementById('ml-reg').innerHTML = '<tr class="loading-row"><td colspan="4"><div class="inline-spinner"></div>LOADING DATA...</td></tr>';
+      document.getElementById('ml-cls').innerHTML = '<tr class="loading-row"><td colspan="3"><div class="inline-spinner"></div>LOADING DATA...</td></tr>';
       const data = await apiFetch('/metrics');
       if (!data) return;
       document.getElementById('ml-reg').innerHTML = (data.metrics.regression || []).map(m => `
