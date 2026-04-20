@@ -2,6 +2,7 @@ services:
   - type: web
     name: ecu-analytics
     env: python
+    plan: free
     buildCommand: "pip install -r requirements.txt && python start.py" # start.py is run once here purely to seed database if needed and load ML models
     startCommand: "gunicorn wsgi:app"
     envVars:
