@@ -124,21 +124,25 @@ except Exception as e:
     sys.exit(1)
 
 # 4. Flask
-print(f"\n  [4/4] Starting Flask server on port {PORT} ...")
-print(f"""
-  ┌─────────────────────────────────────────────────────┐
-  │  Dashboard : http://localhost:{PORT}                   │
-  │  Admin     : http://localhost:{PORT}/admin_login.html  │
-  │  API Health: http://localhost:{PORT}/api/health        │
-  │                                                     │
-  │  Admin login: admin@ecu.com / admin123              │
-  │  Press Ctrl+C to stop                               │
-  └─────────────────────────────────────────────────────┘
-""")
-
-from app import create_app  # type: ignore
-flask_app = create_app()
-try:
-    flask_app.run(host="0.0.0.0", port=PORT, debug=False, use_reloader=False)
-except KeyboardInterrupt:
-    print("\n\n  Server stopped.\n")
+if os.getenv("RENDER"):
+    print("\n  [4/4] Setup complete. Skipping Flask server start because we are in Render build phase.")
+    print("        Gunicorn will handle the server start.")
+else:
+    print(f"\n  [4/4] Starting Flask server on port {PORT} ...")
+    print(f"""
+      ┌─────────────────────────────────────────────────────┐
+      │  Dashboard : http://localhost:{PORT}                   │
+      │  Admin     : http://localhost:{PORT}/admin_login.html  │
+      │  API Health: http://localhost:{PORT}/api/health        │
+      │                                                     │
+      │  Admin login: admin@ecu.com / admin123              │
+      │  Press Ctrl+C to stop                               │
+      └─────────────────────────────────────────────────────┘
+    """)
+    
+    from app import create_app  # type: ignore
+    flask_app = create_app()
+    try:
+        flask_app.run(host="0.0.0.0", port=PORT, debug=False, use_reloader=False)
+    except KeyboardInterrupt:
+        print("\n\n  Server stopped.\n")
