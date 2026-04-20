@@ -86,3 +86,4 @@ Once the server is running, open a web browser and access the following:
 ## Troubleshooting
 - **Port already in use**: If port 5000 is occupied, try running with a different port (e.g., `python3 start.py --port 8080`) or stop the conflicting service. On macOS, port 5000 can sometimes be used by the AirPlay Receiver.
 - **MySQL Connection Failed**: Double-check your `.env` credentials (`DB_USER`, `DB_PASSWORD`), ensure the MySQL service is actively running on the specified `DB_PORT`, and that the `ecu_analytics` database exists.
+# Fuel-Consumption-Prediction-and-Driver-Classification
