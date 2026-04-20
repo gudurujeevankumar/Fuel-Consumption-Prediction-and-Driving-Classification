@@ -1,0 +1,26 @@
+# Secure / Private Files
+.env
+
+# Python Virtual Environment
+.venv/
+env/
+venv/
+ENV/
+
+# Python Cache & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Logs
+logs/
+*.log
+
+# OS / IDE Files
+.DS_Store
+.vscode/
+.idea/
+
+# Database (if any sqlite is created later)
+*.sqlite3
+*.db
