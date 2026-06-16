@@ -82,3 +82,13 @@ Once the server is running, open a web browser and access the following:
 
 # Fuel-Consumption-Prediction-and-Driver-Classification
 
+## Screenshots
+
+| View | View |
+|:---:|:---:|
+| **Live Dashboard**<br>![Live Dashboard](Screenshots/live%20dashboard.png) | **Drive Report**<br>![Drive Report](Screenshots/drive%20report.png) |
+| **Driving Simulation**<br>![Driving Simulation](Screenshots/Driving%20Simulation%20page.png) | **ML Metrics**<br>![ML Metrics](Screenshots/ML%20metrics.png) |
+| **Login Page**<br>![Login Page](Screenshots/login%20Page.png) | **Register Page**<br>![Register Page](Screenshots/Register%20page.png) |
+| **Admin Dashboard**<br>![Admin Dashboard](Screenshots/admin%20dashboard.png) | **Admin Login**<br>![Admin Login](Screenshots/admin%20login.png) |
+| **Alerts Page**<br>![Alerts Page](Screenshots/alerts%20page.png) | **User Alerts in Admin Panel**<br>![User Alerts](Screenshots/user%20alerts%20in%20admin%20pannel.png) |
+| **User Handling Page**<br>![User Handling](Screenshots/user%20handling%20page.png) | |

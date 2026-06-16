@@ -10,6 +10,13 @@
     rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    } else {
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+  </script>
   <style>
     /* ── Theme tokens ─────────────────────────────────────────────────── */
     [data-theme="light"] {
@@ -1040,7 +1047,7 @@
     let allData = { fuel: [], speed: [], rpm: [], labels: [] };
     let myAlerts = [], driveCounts = { Eco: 0, Normal: 0, Aggressive: 0 }, lastOvsp = 0;
     let rpmChart, spdChart, fuelRepChart, spdRepChart, profilePieChart;
-    let polling = null, isDark = false;
+    let polling = null, isDark = document.documentElement.getAttribute('data-theme') === 'dark';
 
     // ── Theme ─────────────────────────────────────────────────────────────
     function toggleTheme() {
@@ -1410,6 +1417,8 @@
 
 
     async function doLogout() { await fetch(API + '/auth/logout', { method: 'POST', credentials: 'include' }); localStorage.clear(); location.href = 'login.html'; }
+    document.getElementById('theme-btn').textContent = isDark ? '☀️' : '🌙';
+    checkSession();
   </script>
 </body>
 
