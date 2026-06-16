@@ -1,33 +1,38 @@
-"""MySQL connection — drop-in replacement for db.js"""
-import os, pymysql, pymysql.cursors
+"""SQLite connection — drop-in replacement for db.js/pymysql"""
+import os, sqlite3
+
+DB_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "ecu_analytics.db")
 
 def get_conn():
-    return pymysql.connect(
-        host=os.getenv("DB_HOST", "localhost"),
-        port=int(os.getenv("DB_PORT", 3306)),
-        user=os.getenv("DB_USER", "root"),
-        password=os.getenv("DB_PASSWORD", ""),
-        database=os.getenv("DB_NAME", "ecu_analytics"),
-        charset="utf8mb4",
-        cursorclass=pymysql.cursors.DictCursor,
-        autocommit=True,
-    )
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+def _prepare_sql(sql):
+    sql = sql.replace("%s", "?")
+    sql = sql.replace("NOW()", "CURRENT_TIMESTAMP")
+    return sql
 
 def query(sql, args=()):
+    sql = _prepare_sql(sql)
     with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(sql, args)
-            return cur.fetchall()
+        cur = conn.cursor()
+        cur.execute(sql, args)
+        rows = cur.fetchall()
+        return [dict(row) for row in rows]
 
 def query_one(sql, args=()):
+    sql = _prepare_sql(sql)
     with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(sql, args)
-            return cur.fetchone()
+        cur = conn.cursor()
+        cur.execute(sql, args)
+        row = cur.fetchone()
+        return dict(row) if row else None
 
 def execute(sql, args=()):
+    sql = _prepare_sql(sql)
     with get_conn() as conn:
-        with conn.cursor() as cur:
-            cur.execute(sql, args)
-            conn.commit()
-            return cur.lastrowid
+        cur = conn.cursor()
+        cur.execute(sql, args)
+        conn.commit()
+        return cur.lastrowid

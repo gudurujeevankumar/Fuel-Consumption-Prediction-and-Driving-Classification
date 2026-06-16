@@ -31,9 +31,13 @@ def create_app():
     app.register_blueprint(metrics_bp, url_prefix="/api/metrics")
 
     @app.get("/api/health")
-    def health():
+    def api_health():
         from datetime import datetime
         return jsonify({"status": "ok", "time": datetime.utcnow().isoformat()})
+
+    @app.get("/health")
+    def root_health():
+        return jsonify({"status": "ok", "message": "Service is healthy"})
 
     # Serve frontend HTML files
     @app.get("/")

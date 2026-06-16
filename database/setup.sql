@@ -1,12 +1,8 @@
--- ECU Analytics — Database Setup
--- Run this once: mysql -u root -p < database/setup.sql
-
-CREATE DATABASE IF NOT EXISTS ecu_analytics CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE ecu_analytics;
+-- ECU Analytics — Database Setup (SQLite)
 
 -- Users
 CREATE TABLE IF NOT EXISTS users (
-  id               INT AUTO_INCREMENT PRIMARY KEY,
+  id               INTEGER PRIMARY KEY AUTOINCREMENT,
   name             VARCHAR(120)  NOT NULL,
   email            VARCHAR(180)  NOT NULL UNIQUE,
   password_hash    VARCHAR(255)  NOT NULL,
@@ -18,11 +14,11 @@ CREATE TABLE IF NOT EXISTS users (
   is_admin         TINYINT(1)    DEFAULT 0,
   created_at       DATETIME      DEFAULT CURRENT_TIMESTAMP,
   last_login       DATETIME
-) ENGINE=InnoDB;
+);
 
 -- Telemetry Log
 CREATE TABLE IF NOT EXISTS telemetry_log (
-  id                   BIGINT AUTO_INCREMENT PRIMARY KEY,
+  id                   INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id              INT           NOT NULL,
   session_id           VARCHAR(60)   NOT NULL,
   timestamp            DATETIME      DEFAULT CURRENT_TIMESTAMP,
@@ -41,27 +37,29 @@ CREATE TABLE IF NOT EXISTS telemetry_log (
   driving_label        VARCHAR(12),
   driving_code         TINYINT,
   speed_alert          TINYINT(1)    DEFAULT 0,
-  INDEX (user_id),
-  INDEX (session_id),
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-) ENGINE=InnoDB;
+);
+
+CREATE INDEX IF NOT EXISTS idx_telemetry_user ON telemetry_log(user_id);
+CREATE INDEX IF NOT EXISTS idx_telemetry_session ON telemetry_log(session_id);
 
 -- Alerts
 CREATE TABLE IF NOT EXISTS alerts (
-  id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id     INT          NOT NULL,
   session_id  VARCHAR(60),
   alert_type  VARCHAR(30)  NOT NULL,
   rpm_value   FLOAT,
   speed_value FLOAT,
   timestamp   DATETIME     DEFAULT CURRENT_TIMESTAMP,
-  INDEX (user_id),
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-) ENGINE=InnoDB;
+);
+
+CREATE INDEX IF NOT EXISTS idx_alerts_user ON alerts(user_id);
 
 -- Drive Sessions
 CREATE TABLE IF NOT EXISTS drive_sessions (
-  id              BIGINT AUTO_INCREMENT PRIMARY KEY,
+  id              INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id         INT      NOT NULL,
   session_id      VARCHAR(60) UNIQUE,
   started_at      DATETIME,
@@ -74,10 +72,10 @@ CREATE TABLE IF NOT EXISTS drive_sessions (
   aggressive_pct  FLOAT,
   alert_count     INT DEFAULT 0,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-) ENGINE=InnoDB;
+);
 
 -- Admin User (password: admin123)
-INSERT IGNORE INTO users (name, email, password_hash, vehicle_api_key, is_admin, is_active)
+INSERT OR IGNORE INTO users (name, email, password_hash, vehicle_api_key, is_admin, is_active)
 VALUES (
   'Administrator',
   'admin@ecu.com',
@@ -85,7 +83,3 @@ VALUES (
   'ADMIN-KEY-001',
   1, 1
 );
--- Note: The hash above is for 'admin123'.
--- start.js will recreate this user with a freshly generated hash if needed.
-
-SELECT 'Database setup complete!' AS status;

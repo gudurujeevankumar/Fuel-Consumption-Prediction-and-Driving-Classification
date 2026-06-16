@@ -24,7 +24,7 @@ if env_file.exists():
 parser = argparse.ArgumentParser(add_help=False)
 parser.add_argument("--port", type=int, default=None)
 args, _ = parser.parse_known_args()
-PORT = args.port or int(os.getenv("PORT", 5000))
+PORT = args.port or int(os.getenv("PORT", 8080))
 
 # Logging
 Path("logs").mkdir(exist_ok=True)
@@ -45,53 +45,20 @@ print("""
 ╚══════════════════════════════════════════════════════╝
 """)
 
-# 1. Database
-print("  [1/4] Connecting to MySQL ...")
+# 1. Database & 2. Schema
+print("  [1/4] Connecting to SQLite and verifying schema ...")
 from backend.db import query_one, execute, get_conn  # type: ignore
 try:
-    get_conn().close()
-    print("  ✓  MySQL connected")
-except Exception as e:
-    if "1049" in str(e) or "Unknown database" in str(e):
-        print("  ⚠  Database not found. Creating it ...")
-        try:
-            import pymysql
-            conn = pymysql.connect(
-                host=os.getenv("DB_HOST", "localhost"),
-                port=int(os.getenv("DB_PORT", 3306)),
-                user=os.getenv("DB_USER", "root"),
-                password=os.getenv("DB_PASSWORD", ""),
-                charset="utf8mb4"
-            )
-            db_name = os.getenv("DB_NAME", "ecu_analytics")
-            with conn.cursor() as cur:
-                cur.execute(f"CREATE DATABASE IF NOT EXISTS `{db_name}`")
-            conn.commit()
-            conn.close()
-            print(f"  ✓  Database '{db_name}' created successfully")
-        except Exception as inner_e:
-            print(f"  ✗  Could not create database '{db_name}': {inner_e}")
-            sys.exit(1)
-    else:
-        print(f"  ✗  MySQL failed: {e}")
-        print("     → Check DB_PASSWORD in .env and ensure MySQL is running")
-        sys.exit(1)
-
-# 2. Schema
-print("  [2/4] Verifying database schema ...")
-sql = (HERE / "database" / "setup.sql").read_text()
-try:
-    import pymysql  # type: ignore
+    sql = (HERE / "database" / "setup.sql").read_text()
     conn = get_conn()
-    with conn.cursor() as cur:
-        for stmt in [s.strip() for s in sql.split(";") if s.strip()]:
-            try: cur.execute(stmt)
-            except Exception as e:
-                if "already exists" not in str(e).lower(): pass
-    conn.commit(); conn.close()
-    print("  ✓  Schema ready")
+    cur = conn.cursor()
+    cur.executescript(sql)
+    conn.commit()
+    conn.close()
+    print("  ✓  SQLite connected & Schema ready")
 except Exception as e:
-    print(f"  ⚠  Schema warning: {e}")
+    print(f"  ✗  SQLite setup failed: {e}")
+    sys.exit(1)
 
 # Refresh admin password
 try:
