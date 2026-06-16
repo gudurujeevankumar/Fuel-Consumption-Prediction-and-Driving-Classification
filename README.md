@@ -80,8 +80,6 @@ Once the server is running, open a web browser and access the following:
 - **Port already in use**: If port 8080 is occupied, try running with a different port (e.g., `python3 start.py --port 5000`) or stop the conflicting service.
 - **ML Models fail to load**: If you get pickling or version errors (e.g., `_loss` module missing), delete the `backend/ml/saved_models/models.pkl` file and run `start.py` again to automatically retrain fresh models.
 
-# Fuel-Consumption-Prediction-and-Driver-Classification
-
 ## Screenshots
 
 | View | View |
